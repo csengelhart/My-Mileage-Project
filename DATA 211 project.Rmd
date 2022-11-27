@@ -1,0 +1,103 @@
+---
+title: "Do I drive more miles per day than the average American?"
+author: "Chris Engelhart"
+date: "11/25/2022"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+## Research Question: Do I drive significantly more miles per day than the average American?
+```
+
+```{r}
+library(ggplot2)
+library(tidyverse)
+library(plotly)
+library(dplyr)
+```
+
+```{r}
+## Create time series chart of data to get 
+## overview of data
+preformdates <- Mileage_Data$Date
+Dates <- as.Date(preformdates, format("%Y-%m-%d"))
+Miles <- Mileage_Data$Miles
+
+milesdf <- data.frame(Dates,Miles)
+
+timechart <- ggplot(data = milesdf, aes(x = Dates , y = Miles)) + geom_line() + labs(title = "My Daily Driving Mileage") + scale_x_date(date_breaks = "1 day") + theme(axis.text.x = element_text(angle = 90))
+timechart
+
+## observations: A lot of up and downs in the chart. Which makes sense with my driving habits, as I don't work everyday and I primary commute is to work.I live about 35 miles away from work(one way). So, there are days of the week that I barely drive, and others where I can easily drive over 70 miles.
+
+```
+
+
+```{r}
+## Create histogram
+ggplot(milesdf, aes(x = Miles)) + geom_histogram(bins = 5,binwidth = 21.16,fill = "gold",color = "black", boundary = 0) + labs(y = "Count", title = "Distribution of My Mileage Data")
+## observations: 
+##
+## The graph has an asymmetric shape and is bi modal, meaning two peaks: in the  60-80 bin most common, second most common is the 0-20 bin
+## the graph shows that the data is wide spread further supporting the notion that my daily mileage is not consistent.
+```
+
+
+```{r}
+## create boxplot for mileage data
+milesbox <- ggplot(milesdf, aes(x = factor(0), y = Miles)) + geom_boxplot() + theme(axis.title.x=element_blank(),axis.text.x=element_blank(),axis.ticks.x=element_blank()) + ggtitle("My Daily Driving Mileage") 
+                                                            
+ggplotly(milesbox)
+
+
+## observations: median is is 56.50, median is the middle value found by ordering all data points and picking out the one in the middle. 
+
+## the box is big, indicating a big Interquartile range (Q3-Q1), this means that the middle half of the data is highly variable.
+
+## min 0,q1 = 4.50, median = 56.50, q3= 74.70 min max = 105.80 miles
+```
+
+
+
+
+
+```{r}
+## Calculate Average Daily Mileage
+avgmiles <- mean(milesdf$Miles)
+avgmiles
+
+## calculate standard devation of my mileage 
+stdev <- sd(milesdf$Miles)
+stdev
+
+## my average daily mileage = 46.29 miles
+## standard deviation = 36.56 miles
+
+## high standard deviation indicating high variability in the data set
+```
+
+
+```{r}
+## average miles the average american drives daily is 29 miles, according to the bureau of transportaion : https://www.bts.gov/statistical-products/surveys/national-household-travel-survey-daily-travel-quick-facts
+
+## compare mean mileages to see if there is a significant difference
+## H0: µ(Chris) = µ(US)
+## Ha: µ(Chris) > µ(US)
+
+## use t-test to compare the two means
+
+avgChris <- 46
+avgUS <- 29
+
+t.test(milesdf$Miles, mu = avgUS, alternative = "greater")
+
+## p-value = 0.04
+## 95% confidence interval
+
+## p < 0.05 , we reject H0, there is sufficient evidence to support the claim that I drive signicantly more miles per day on average than the average American
+```
+
