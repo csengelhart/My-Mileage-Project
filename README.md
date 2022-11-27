@@ -1,2 +1,2 @@
 # My-Mileage-Project
-Investigate whether I drive more than the Average American
+Investigated whether I drive more than the average American
